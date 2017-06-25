@@ -1,0 +1,80 @@
+/************* GERAL *********************/
+html,body{
+    width:100%;
+    height: 100%;
+}
+
+.separator{
+    width: 100%;
+    border-top: 1px solid #eeeeee;
+    margin: 10px 0;
+}
+
+/************* ICONES *********************/
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+.material-icons.md-56 { font-size: 56px; }
+
+.icon-animate {
+    -animation: spin .7s infinite linear;
+    -webkit-animation: spin2 .7s infinite linear;
+}
+
+@-webkit-keyframes spin2 {
+    from { -webkit-transform: rotate(360deg);}
+    to { -webkit-transform: rotate(0deg);}
+}
+
+@keyframes spin {
+    from { transform: scale(1) rotate(360deg);}
+    to { transform: scale(1) rotate(0deg);}
+}
+
+/************* NAVBAR *******************/
+.navbar-fixed-top {
+    border: 0;
+}
+
+.navbar p{
+    color: #FFF;
+    margin: 0;
+    font-size: 12px;
+}
+
+
+/** CONTENT **/
+
+.main {
+    padding: 20px;
+    padding-top: 85px;
+}
+
+.results{
+    padding: 20px;
+}
+
+.page-header {
+    margin-top: 0;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.page-header i {
+    float: left;
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.vertical-container {
+    display: table;
+    table-layout: fixed;
+    height: 100%;
+}
+
+.vertical {
+    display:table-cell;
+    vertical-align:middle;
+    height: 100%;
+}

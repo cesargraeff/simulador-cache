@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="cache">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Cache</title>
+
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <meta name="theme-color" content="#1976D2">
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <meta property="og:image" content="favicon.png">
+
+    <link href="lib/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="lib/izitoast/iziToast.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+
+    <link rel="stylesheet" href="app/assets/css/main.css">
+
+</head>
+<body ng-controller="AppController as vm">
+
+    <nav class="navbar navbar-fixed-top navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand">
+                    <img src="app/assets/img/logo.png" />
+                </a>
+            </div>
+
+            <div class="pull-right text-right hidden-xs">
+                <p style="margin-top: 15px;font-size: 10px;">UCS - ARQUITETURA DE COMPUTADORES I</p>
+                <p style="font-size: 10px;">ANDERSON PILATI E CÉSAR A. GRAEFF</p>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="main col-md-12" ng-init="params = {}">
+                <div class="row">
+                    <div class="col-md-9">
+                        <h1 class="page-header">
+                            <i class="material-icons">&#xE322;</i>
+                            Memória Cache
+                        </h1>
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="tam_linha">Tamanho da Linha</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">2 ^</div>
+                                        <input id="tam_linha" type="number" class="form-control" ng-model="params.tam_linha" />
+                                        <div class="input-group-addon">Bytes</div>
+                                    </div>
+                                </div>
+                                <p class="text-center"><b>{{params.tam_linha | quadrado}} Bytes</b></p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="tam_linha">Numero de Linhas</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">2 ^</div>
+                                        <input id="num_linhas" type="number" class="form-control" ng-model="params.num_linhas" />
+                                        <div class="input-group-addon">Linhas</div>
+                                    </div>
+                                </div>
+                                <p class="text-center"><b>{{params.num_linhas | quadrado}} Linhas</b></p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="linhas_conjunto">Linhas por Conjunto</label>
+                                    <div class="input-group">
+                                        <div class="input-group-addon">2 ^</div>
+                                        <input id="linhas_conjunto" type="number" class="form-control" ng-model="params.linhas_conjunto" />
+                                        <div class="input-group-addon">Linhas</div>
+                                    </div>
+                                </div>
+                                <p class="text-center"><b>{{params.linhas_conjunto | quadrado}} Linhas</b></p>
+                            </div>
+
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="cache_hit">Hit Time</label>
+                                    <div class="input-group">
+                                        <input id="cache_hit" type="number" class="form-control" ng-model="params.cache_hit" />
+                                        <div class="input-group-addon">ns</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="politica_escrita">Politica de Escrita</label>
+                                    <select id="politica_escrita" class="form-control" ng-model="params.politica_escrita">
+                                        <option value="0">Write-Through</option>
+                                        <option value="1">Write-Back</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="politica_substituicao">Politica de Substituiçao</label>
+                                    <select id="politica_substituicao" class="form-control" ng-model="params.politica_substituicao">
+                                        <option value="0">LFU (Least Frequently Used)</option>
+                                        <option value="1">LRU (Least Recently Used)</option>
+                                        <option value="2">Aleatório</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <p>Numero de Conjuntos</p>
+                                <p class="text-center" ng-show="params.num_linhas && params.linhas_conjunto">
+                                    2 ^ {{params.num_linhas - params.linhas_conjunto}} = <b>{{params.num_linhas - params.linhas_conjunto | quadrado}}
+                                    Conjuntos</b>
+                                </p>
+                                <p class="text-center" ng-hide="params.num_linhas && params.linhas_conjunto"><b>0 Conjuntos</b></p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <p>Tamanho da Cache</p>
+                                <p class="text-center">
+                                    <b>
+                                        {{params.num_linhas + params.tam_linha | quadrado}} Bytes
+                                    </b><br>
+                                    <b ng-if="params.num_linhas + params.tam_linha >= 10">
+                                        {{params.num_linhas + params.tam_linha - 10 | quadrado}} KB
+                                    </b><br>
+                                    <b ng-if="params.num_linhas + params.tam_linha >= 20">
+                                        {{params.num_linhas + params.tam_linha - 20 | quadrado}} MB
+                                    </b>
+                                </p>
+                            </div>
+
+                            <div class="col-md-4">
+                                <p>Distribuição do Endereço</p>
+
+                                <div class="row text-center" style="font-size: 10px;">
+                                    <div class="col-xs-4" style="padding-left: 40px;">
+                                       TAG
+                                    </div>
+                                    <div class="col-xs-4">
+                                        CONJUNTO
+                                    </div>
+                                    <div class="col-xs-4" style="padding-right: 40px;">
+                                        PALAVRA
+                                    </div>
+                                </div>
+
+                                <div class="row text-center" style="padding: 0 20px; color: #0a6ebd;">
+                                    <div class="col-xs-4" style="border: 1px solid #CCC;">
+                                            {{ 32 - ((params.num_linhas - params.linhas_conjunto) + params.tam_linha)}}B
+                                    </div>
+                                    <div class="col-xs-4" style="border: 1px solid #CCC;">
+                                            {{params.num_linhas - params.linhas_conjunto || 0}}B
+                                    </div>
+                                    <div class="col-xs-4" style="border: 1px solid #CCC;">
+                                            {{params.tam_linha || 0}}B
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <h1 class="page-header">
+                            <i class="material-icons">&#xE322;</i>
+                            Memória Principal
+                        </h1>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="mp_hit">Hit Time</label>
+                                    <div class="input-group">
+                                        <input id="mp_hit" type="number" class="form-control" ng-model="params.mp_hit" />
+                                        <div class="input-group-addon">ns</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>Tamanho da Memória Principal</p>
+                                <p class="text-center"><b>4 GB</b></p>
+                            </div>
+                        </div>
+
+                        <h1 class="page-header">
+                            <i class="material-icons">&#xE2BC;</i>
+                            Arquivo
+                        </h1>
+
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="file" class="btn btn-block btn-success">
+                                        <i class="material-icons pull-left">&#xE2C3;</i>
+                                        SELECIONAR ARQUIVO
+                                    </label>
+                                    <input id="file" file="fileName" type="file" ng-model="params.file" accept=".cache" file-select="data" style="display: none;">
+                                </div>
+                                <p class="text-center">{{fileName || 'Nenhum arquivo selecionado'}}</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="separator"></div>
+        <div class="row">
+            <div class="col-md-9 text-center">
+                <i class="material-icons md-36 icon-animate" ng-show="loading">&#xE627;</i>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <button class="btn btn-primary btn-lg btn-block" ng-click="vm.processar(params)" ng-disabled="loading">
+                        <i class="material-icons pull-left">&#xE01B;</i>
+                        SIMULAR
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="separator"></div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 results">
+                <h1 class="page-header">
+                    <i class="material-icons">&#xE85C;</i>
+                    Resultados
+                </h1>
+
+                <div class="row" style="padding: 10px;">
+                    <div class="col-md-3">
+                        <h1 class="page-header">
+                            <i class="material-icons">&#xE2BC;</i>
+                            Arquivo
+                        </h1>
+
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <p>Linhas</p>
+                                <p><b>{{vm.resultados.linhas_arquivo || 0}}</b></p>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <p>Leituras</p>
+                                <p><b>{{vm.resultados.leituras_arquivo || 0}}</b></p>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <p>Escritas</p>
+                                <p><b>{{vm.resultados.escritas_arquivo || 0}}</b></p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-5">
+                        <h1 class="page-header">
+                            <i class="material-icons">&#xE322;</i>
+                            Memória Cache
+                        </h1>
+
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <p>Leituras</p>
+                                <p><b>{{vm.resultados.leituras || 0}}</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p>Acertos</p>
+                                <p><b>{{vm.resultados.cache.leituras || 0}}</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p>Taxa de Acerto</p>
+                                <p><b>{{(vm.resultados.cache.leituras / vm.resultados.leituras * 100) || 0 | number:4}}%</b></p>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <p>Escritas</p>
+                                <p><b>{{vm.resultados.escritas || 0}}</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p>Acertos</p>
+                                <p><b>{{vm.resultados.cache.escritas || 0}}</b></p>
+                            </div>
+                            <div class="col-md-4">
+                                <p>Taxa de Acerto</p>
+                                <p><b>{{(vm.resultados.cache.escritas / vm.resultados.escritas * 100) || 0 | number:4}}%</b></p>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="row text-center">
+                            <div class="col-md-6">
+                                <p>Tempo Médio</p>
+                                <p><b>{{vm.resultados.tempo_medio || 0 | number:4}} ns</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>Taxa de Acerto Total</p>
+                                <p><b>{{((vm.resultados.cache.escritas + vm.resultados.cache.leituras) / (vm.resultados.escritas + vm.resultados.leituras) * 100) || 0 | number:4}}%</b></p>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4">
+                        <h1 class="page-header">
+                            <i class="material-icons">&#xE322;</i>
+                            Memória Principal
+                        </h1>
+
+                        <div class="row text-center">
+                            <div class="col-md-6">
+                                <p>Leituras</p>
+                                <p><b>{{vm.resultados.memoria.leituras || 0}}</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>Razão</p>
+                                <p><b>{{(vm.resultados.memoria.leituras / vm.resultados.leituras * 100) || 0 | number:4}}%</b></p>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="row text-center">
+                            <div class="col-md-6">
+                                <p>Escritas</p>
+                                <p><b>{{vm.resultados.memoria.escritas || 0}}</b></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p>Razão</p>
+                                <p><b>{{(vm.resultados.memoria.escritas / vm.resultados.escritas * 100) || 0 | number:4}}%</b></p>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="row text-center">
+                            <div class="col-md-12">
+                                <p>Acessos</p>
+                                <p><b>{{vm.resultados.memoria.leituras + vm.resultados.memoria.escritas || 0}}</b></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="lib/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="lib/bootstrap/bootstrap.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular-messages.min.js"></script>
+    <script type="text/javascript" src="lib/izitoast/iziToast.min.js"></script>
+
+    <script type="text/javascript" src="app/app.module.js"></script>
+    <script type="text/javascript" src="app/filters/quadrado.filter.js"></script>
+    <script type="text/javascript" src="app/directives/file.directive.js"></script>
+    <script type="text/javascript" src="app/controllers/app.controller.js"></script>
+
+</body>
+</html>
